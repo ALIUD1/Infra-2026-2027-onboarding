@@ -93,6 +93,19 @@ Once egress is done the EVA starts and the EV walks the POI loop (lander, A, B, 
 
 That's it. You've now run the same data path we'll use at test week: a server, a client, and Unity, all talking over the network.
 
+## Save your work
+
+Work on your own branch, never on `main`. Once you've accepted the GitHub invite:
+
+```
+git switch -c yourname
+git add watchdog.py
+git commit -m "Mission 1 watchdog"
+git push -u origin yourname
+```
+
+After that, `git push` is enough. If `git commit` asks who you are, run `git config --global user.name "Your Name"` and `git config --global user.email "you@example.com"` once.
+
 ## API
 
 | | Path | Notes |
