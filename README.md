@@ -18,7 +18,15 @@ the switches                     the fake TSS                     the HMD
 
 ## Setup
 
-Python 3.9+ and Unity 2021 LTS or newer.
+Python 3.10+ and Unity 2021 LTS or newer (Unity 6 works).
+
+```
+git clone https://github.com/ALIUD1/Infra-2026-2027-onboarding.git
+cd Infra-2026-2027-onboarding
+python -m venv .venv
+```
+
+Activate it: `.venv\Scripts\activate` on Windows, `source .venv/bin/activate` on Mac/Linux. Do this in every new terminal you open for this repo. Then:
 
 ```
 pip install -r requirements.txt
@@ -26,6 +34,8 @@ python mock_tss.py
 ```
 
 Open http://localhost:8000/docs. If that page loads, you're set.
+
+On a Mac, `python` might be called `python3`. If `mock_tss.py` crashes with "address already in use" or `WinError 10048`, see [When it doesn't work](#when-it-doesnt-work).
 
 ## Missions
 
@@ -43,11 +53,12 @@ Run `reset` in the panel when you're done.
 
 ### 2. Unity (15 min)
 
-1. New 3D project. Copy `TssClient.cs` into `Assets`.
-2. Create an empty GameObject, add the **TssClient** component, press Play. Live numbers show up top left.
-3. Add a Cube and drag it into **Ev Marker**.
-4. Set the Main Camera to position (0, 20, 0) and rotation (90, 0, 0). Now you're looking at a top down map with north up.
-5. Click a toggle in the debug panel. Unity just sent data to the server, and `watch` in your terminal shows it.
+1. New project from any 3D template. Copy `TssClient.cs` into `Assets`.
+2. Edit → Project Settings → Player → Other Settings → **Allow downloads over HTTP** → **Always allowed**. Unity blocks plain `http://` by default, and without this the toggles in step 6 fail with "Insecure connection not allowed".
+3. Create an empty GameObject, add the **TssClient** component, press Play. Live numbers show up top left.
+4. Add a Cube and drag it into **Ev Marker**.
+5. Set the Main Camera to position (0, 20, 0) and rotation (90, 0, 0). Now you're looking at a top down map with north up.
+6. Click a toggle in the debug panel. Unity just sent data to the server, and `watch` in your terminal shows it.
 
 ### 3. Run the real egress (15 min)
 
@@ -111,6 +122,8 @@ For DCU switches the name says what `true` means, so `batt_umb: false` is LOCAL 
 
 ## When it doesn't work
 
+* **"address already in use" / `WinError 10048` when starting the server.** Something else on your laptop already uses port 8000. Close it, or run the server on another port with `uvicorn mock_tss:app --host 0.0.0.0 --port 8001`, then `python panel.py 127.0.0.1:8001`, and set **Port** to 8001 on the TssClient component.
+* **`No module named ...`.** Your venv isn't active in that terminal. Activate it (see Setup) and try again.
 * **Headset can't connect.** Use your laptop's IP, not localhost (mock_tss.py prints it on startup). Both devices need to be on the same network, and campus WiFi often blocks device to device traffic, so a phone hotspot or travel router is the easy fix. Let Python through your firewall when it asks.
 * **"Insecure connection not allowed" in Unity.** Player Settings → Other Settings → Allow downloads over HTTP → Always allowed. This only affects UnityWebRequest (polling and switch flips), not the WebSocket.
 * **A value is stuck at 0 in Unity.** JsonUtility silently skips fields it can't match. Check the spelling in the C# classes and that they're `[Serializable]`.
@@ -121,4 +134,4 @@ For DCU switches the name says what `true` means, so `batt_umb: false` is LOCAL 
 
 ## Tests
 
-`pytest` runs the whole egress procedure against the sim, fast forwarded, in under a second.
+`pytest` runs the whole egress procedure against the sim, fast forwarded, in under a second. You should see `3 passed`. A deprecation warning about `httpx` is harmless.

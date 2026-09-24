@@ -1,0 +1,9 @@
+fastapi>=0.100
+pydantic>=2
+uvicorn[standard]
+requests
+websockets>=12
+
+# for the tests
+pytest
+httpx
